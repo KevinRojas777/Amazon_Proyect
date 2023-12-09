@@ -14,7 +14,7 @@ def generate_page(data):
         html.H2("Dashboard Nike_Adidas"),
         html.P("Objetivo: Mostrar los resultados de Nike y Adidas"),
         html.Hr(),
-        dcc.Dropdown(options=["Precio", "Envio_p"], value="Precio", id="dpColumn"),
+        dcc.Dropdown(options=[{'label': 'Precio', 'value': 'Precio'}, {'label': 'Envio_p', 'value': 'Envio_p'}], value="Precio", id="dpColumn"),
         dcc.Graph(figure={}, id="fig_Column"),
         dash_table.DataTable(data=data_resumen.to_dict("records"), page_size=15, id="tbl")
     ])
@@ -26,7 +26,7 @@ def generate_page(data):
     Input(component_id="dpColumn", component_property="value")
 )
 def update_grafica(column_chosen):
-    data_resumen = data.groupby("Nombre", as_index=False).sum(numeric_only=True)
+    data_resumen = data_nike_adidas.groupby("Nombre", as_index=False).sum(numeric_only=True)
     fig = px.line(data_resumen, x="Nombre", y=column_chosen)
     return fig
 
