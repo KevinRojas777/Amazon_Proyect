@@ -1,0 +1,37 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import plotly.express as px
+import dash
+from dash import dcc, html
+from dash.dependencies import Input, Output
+
+nike_df = pd.read_csv('Amazon_Nike_norm.csv')
+adidas_df = pd.read_csv('Amazon_Adidas_norm.csv')
+puma_df = pd.read_csv('Amazon_Puma_norm.csv')
+
+nike_df['Marca'] = 'Nike'
+adidas_df['Marca'] = 'Adidas'
+puma_df['Marca'] = 'Puma'
+
+combined_df = pd.concat([nike_df, adidas_df, puma_df])
+
+app = dash.Dash(__name__)
+
+app.layout = html.Div([
+    dcc.Graph(id='scatter-plot'),
+])
+
+@app.callback(
+    Output('scatter-plot', 'figure'),
+    [Input('scatter-plot', 'hoverData')]
+)
+def update_scatter_plot(hover_data):
+    
+    fig = px.scatter(combined_df, x='Precio', y='Envio_p', color='Marca', hover_data=['Nombre'])
+
+    return fig
+
+if __name__ == '__main__':
+    app.run_server(debug=True)
+
