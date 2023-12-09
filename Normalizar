@@ -1,0 +1,59 @@
+import pandas as pd
+import re
+
+def normalizar(archivo_csv):
+    # Leer el archivo CSV
+    data = pd.read_csv(archivo_csv)
+
+    # Extraer los primeros 20 caracteres de las columnas 'Nombre' y 'Precio'
+    data['Nombre'] = data['Nombre'].str[:30]
+    data['Precio'] = data['Precio'].bfill()
+
+    data['Envio'] = data['Envio'].bfill()
+    data['Envio'] = data['Envio'].str[-10:]
+
+    # Definir la expresión regular para extraer el valor numérico
+    patron = r'\$\s*([\d,]+)'
+
+    # Función para normalizar la columna Precio
+    def extraer_valor(cadena):
+        coincidencia = re.search(patron, str(cadena))
+        if coincidencia:
+            valor = coincidencia.group(1)
+            # Eliminar comas (si están presentes) y convertir a punto flotante
+            valor = float(valor.replace(',', ''))
+            return valor
+        else:
+            return None
+
+    # Aplicar la función a la columna correspondiente en el DataFrame
+    data['Precio'] = data['Precio'].apply(extraer_valor)
+
+    return data[['Nombre', 'Precio', 'Envio']]
+
+### Archivos a normalizar
+
+archivo_entrada = "Amazon_Puma.csv"
+data_puma = normalizar(archivo_entrada)
+
+archivo_salida = "Amazon_Puma_norm.csv"
+data_puma.to_csv(archivo_salida, index=False)
+
+##############
+
+archivo_Adidas = "Amazon_Adidas.csv"
+data_Adidas = normalizar(archivo_Adidas)
+
+archivo_salida = "Amazon_Adidas_norm.csv"
+data_Adidas.to_csv(archivo_salida, index=False)
+
+###############
+
+archivo_Nike = "Amazon_Nike.csv"
+data_Nike = normalizar(archivo_Nike)
+
+archivo_salida = "Amazon_Nike_norm.csv"
+data_Nike.to_csv(archivo_salida, index=False)
+
+# Imprimir los df
+print(f"{data_puma} \n {data_Adidas} \n {data_Nike}")
