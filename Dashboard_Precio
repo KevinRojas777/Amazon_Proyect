@@ -1,0 +1,61 @@
+import dash
+from dash import dcc, html
+from dash.dependencies import Input, Output
+import pandas as pd
+
+nike_df = pd.read_csv('Amazon_Nike_norm.csv')
+adidas_df = pd.read_csv('Amazon_Adidas_norm.csv')
+puma_df = pd.read_csv('Amazon_Puma_norm.csv')
+
+
+app = dash.Dash(__name__)
+
+app.layout = html.Div([
+    html.H1("Comparación de Precios por Día"),
+
+    dcc.Dropdown(
+        id='brand-dropdown',
+        options=[
+            {'label': 'Nike', 'value': 'Nike'},
+            {'label': 'Adidas', 'value': 'Adidas'},
+            {'label': 'Puma', 'value': 'Puma'}
+        ],
+        value='Nike',  
+        style={'width': '50%'}
+    ),
+
+    html.Div([
+        dcc.Graph(id='price-table')
+    ]),
+])
+
+@app.callback(
+    Output('price-table', 'figure'),
+    [Input('brand-dropdown', 'value')]
+)
+def update_table(selected_brand):
+    if selected_brand == 'Nike':
+        df = nike_df
+    elif selected_brand == 'Adidas':
+        df = adidas_df
+    elif selected_brand == 'Puma':  # Corregido aquí
+        df = puma_df
+    else:
+        df = pd.DataFrame()
+
+    figure = {
+        'data': [
+            {
+                'type': 'table',
+                'header': dict(values=['Envio_p', 'Precio']),
+                'cells': dict(values=[df['Envio_p'], df['Precio']])
+            }
+        ],
+        'layout': {
+            'title': f'Precios de {selected_brand} por Día',
+        }
+    }
+    return figure
+
+if __name__ == '__main__':
+    app.run_server(debug=True)
