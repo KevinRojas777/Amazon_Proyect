@@ -1,0 +1,26 @@
+import pymongo
+import pandas as pd
+
+def insertar_valores(archivos_csv, colecciones):
+    # Conectar a MongoDB
+    myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+    database = myclient["Marcas"]
+
+    for archivo, nombre_coleccion in zip(archivos_csv, colecciones):
+        # Leer el archivo CSV
+        datos = pd.read_csv(archivo)
+
+        # Obtener la colección
+        coleccion = database[nombre_coleccion]
+
+        # Convertir los datos a formato JSON y insertar en MongoDB
+        registros = datos.to_dict(orient='records')
+        coleccion.insert_many(registros)
+
+    # Cerrar la conexión
+    myclient.close()
+
+# Ejemplo de uso con tres archivos CSV y tres colecciones diferentes
+archivos_csv = ["Amazon_Nike_norm.csv", "Amazon_Puma_norm.csv", "Amazon_Adidas_norm.csv"]
+colecciones = ["Nike", "Puma", "Adidas"]
+insertar_valores(archivos_csv, colecciones)
