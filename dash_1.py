@@ -3,7 +3,7 @@ import plotly.express as px
 from dash import Dash, dcc, html
 
 # Leer el CSV y filtrar los datos
-data = pd.read_csv("Amazon_Adidas.csv")
+data = pd.read_csv("Amazon_Adidas_norm.csv")
 filtered_data = data[data['Precio'] > 100]
 
 # Crear la gráfica
